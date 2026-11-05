@@ -1,0 +1,22 @@
+{
+  "datum": "2026-11-05",
+  "stand": "08:00",
+  "quellen": [
+    { "name": "Gmail", "status": "ok" },
+    { "name": "Microsoft Teams", "status": "fehlt", "hinweis": "Microsoft 365 auf claude.ai verbinden" },
+    { "name": "Kalender", "status": "fehlt", "hinweis": "Microsoft 365 oder Google Kalender verbinden" },
+    { "name": "Aufgaben", "status": "fehlt", "hinweis": "Noch kein Aufgaben-Dienst verbunden" }
+  ],
+  "termine": [
+    { "zeit": "09:30", "titel": "Beispiel: Team-Besprechung", "ort": "Online", "vorbereitung": "Notizen von letzter Woche lesen" },
+    { "zeit": "14:00", "titel": "Beispiel: Zahnarzt", "ort": "Praxis Musterstraße 1", "vorbereitung": "Versichertenkarte mitnehmen" }
+  ],
+  "aufgaben": [
+    { "id": "b1", "prioritaet": "hoch", "titel": "Beispiel: Rückfrage von Anna beantworten", "quelle": "E-Mail", "von": "Anna Beispiel", "grund": "Sie wartet heute auf eine Antwort." },
+    { "id": "b2", "prioritaet": "hoch", "titel": "Beispiel: Rechnung bis heute bezahlen", "quelle": "E-Mail", "von": "Stadtwerke", "grund": "Frist läuft heute ab." },
+    { "id": "b3", "prioritaet": "mittel", "titel": "Beispiel: Angebot vergleichen", "quelle": "Aufgabe", "grund": "Bis Freitag entscheiden." },
+    { "id": "b4", "prioritaet": "niedrig", "titel": "Beispiel: 12 Newsletter", "quelle": "E-Mail", "grund": "Kein Handlungsbedarf." }
+  ],
+  "statistik": { "emails": 18, "newsletter": 12, "teams": null, "aufgaben": 3 },
+  "vorschlag": "Beispiel: Starte mit der Antwort an Anna und der Rechnung, danach ist bis 14:00 Zeit für das Angebot."
+}

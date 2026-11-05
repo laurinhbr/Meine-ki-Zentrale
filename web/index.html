@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KI-Alltagszentrale</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="kopf">
+    <div>
+      <h1>KI-Alltagszentrale</h1>
+      <p class="untertitel" id="datum">–</p>
+    </div>
+    <div class="aktionen">
+      <label class="knopf" title="Tagesplan-Datei (.json) öffnen">
+        Tagesplan laden
+        <input type="file" id="datei" accept=".json,application/json" hidden>
+      </label>
+      <button class="knopf" id="gmail" type="button" hidden>Gmail laden</button>
+      <button class="knopf leise" id="beispiel" type="button">Beispiel</button>
+    </div>
+  </header>
+
+  <main>
+    <p class="hinweis" id="hinweis" hidden></p>
+
+    <section class="karte" aria-labelledby="t-quellen">
+      <h2 id="t-quellen">Quellen</h2>
+      <ul class="quellen" id="quellen"></ul>
+    </section>
+
+    <div class="raster">
+      <section class="karte prio-hoch" aria-labelledby="t-hoch">
+        <h2 id="t-hoch"><span class="punkt"></span>Hohe Priorität <small>heute</small></h2>
+        <ul class="liste" id="liste-hoch"></ul>
+      </section>
+
+      <section class="karte" aria-labelledby="t-termine">
+        <h2 id="t-termine">Termine</h2>
+        <ul class="liste" id="termine"></ul>
+      </section>
+
+      <section class="karte prio-mittel" aria-labelledby="t-mittel">
+        <h2 id="t-mittel"><span class="punkt"></span>Mittlere Priorität <small>diese Woche</small></h2>
+        <ul class="liste" id="liste-mittel"></ul>
+      </section>
+
+      <section class="karte prio-niedrig" aria-labelledby="t-niedrig">
+        <h2 id="t-niedrig"><span class="punkt"></span>Niedrig / zur Info</h2>
+        <ul class="liste" id="liste-niedrig"></ul>
+      </section>
+    </div>
+
+    <div class="raster">
+      <section class="karte" aria-labelledby="t-stat">
+        <h2 id="t-stat">Kurz-Statistik</h2>
+        <dl class="statistik" id="statistik"></dl>
+      </section>
+
+      <section class="karte" aria-labelledby="t-vorschlag">
+        <h2 id="t-vorschlag">Vorschlag für den Tag</h2>
+        <p id="vorschlag">–</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fuss">
+    Nur lesend · Mails und Tagespläne werden nur angezeigt, nicht gespeichert. Nur abgehakte Punkte merkt sich dein Gerät.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

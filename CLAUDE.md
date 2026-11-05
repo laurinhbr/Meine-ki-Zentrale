@@ -48,6 +48,9 @@ Meine-ki-Zentrale/
 ├── docs/
 │   ├── konnektoren.md            ← welche Datenquellen angebunden sind
 │   └── prioritaeten.md           ← wie Wichtigkeit bewertet wird
+├── web/                          ← Web-App: zeigt Tagespläne übersichtlich an
+│   ├── index.html, style.css, app.js
+│   └── daten/beispiel.json       ← Beispiel-Tagesplan (keine echten Daten)
 └── tagesplaene/                  ← lokale Ablage für erzeugte Tagespläne (privat)
 ```
 

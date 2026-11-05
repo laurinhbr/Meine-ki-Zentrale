@@ -78,6 +78,9 @@ Antworte in genau diesem Format:
 ### 5. Abschluss
 Frag mich am Ende, ob ich
 - zu einem Punkt einen **Antwortentwurf** (nur Text) möchte, oder
-- den Tagesplan lokal in `tagesplaene/JJJJ-MM-TT.md` speichern will.
+- den Tagesplan lokal speichern will – als `tagesplaene/JJJJ-MM-TT.md` und
+  zusätzlich als `tagesplaene/JJJJ-MM-TT.json` für die Web-App (`web/`).
+  Das JSON-Format steht in `web/README.md`, ein Beispiel in
+  `web/daten/beispiel.json`.
 
 Speichern nur nach meiner Zustimmung; diese Dateien werden nicht committet.
