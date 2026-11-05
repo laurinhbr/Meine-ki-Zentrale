@@ -22,7 +22,21 @@
     --mittel: #e0b45a;
     --niedrig: #7cc08c;
     --erledigt: #6d6b66;
+    color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --hg: #161614;
+  --karte: #20201d;
+  --text: #ecebe7;
+  --leise: #a3a19b;
+  --linie: #34332f;
+  --akzent: #7fa9d4;
+  --hoch: #f08a5d;
+  --mittel: #e0b45a;
+  --niedrig: #7cc08c;
+  --erledigt: #6d6b66;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
