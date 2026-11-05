@@ -20,6 +20,20 @@ python3 -m http.server 8000
 ```
 Dann im Browser `http://localhost:8000/web/` öffnen.
 
+## Gmail live (in claude.ai)
+
+Öffnest du die App als privates Artifact auf claude.ai, erscheint der Knopf
+**„Gmail laden“**. Er liest die Mails der letzten 24 Stunden aus deinem
+Posteingang – über deine eigene Gmail-Verbindung und erst nach deiner
+Zustimmung.
+
+- Die Seite darf **nur suchen/lesen** (`search_threads`), nicht senden,
+  löschen oder markieren.
+- Mails werden **nicht gespeichert** (kein Zwischenspeicher), nur angezeigt.
+- Die Priorität wird mit einfachen Regeln geschätzt (z. B. Werbung → niedrig,
+  Sicherheitshinweis → hoch). Bitte selbst kurz prüfen.
+- Außerhalb von claude.ai (z. B. als lokale Datei) gibt es den Knopf nicht.
+
 ## Woher kommt der Tagesplan?
 
 Sag in Claude Code: „Mach mir meine Tagesplanung“. Der Skill `tagesplanung`

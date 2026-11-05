@@ -122,7 +122,10 @@
     });
   }
 
+  let echteDaten = false;
+
   function zeige(plan, herkunft) {
+    if (herkunft !== "beispiel") echteDaten = true;
     $("datum").textContent = formatDatum(plan.datum) + (plan.stand ? " · Stand " + plan.stand : "");
     $("vorschlag").textContent = plan.vorschlag || "–";
     zeigeQuellen(plan);
@@ -131,7 +134,9 @@
     zeigeStatistik(plan);
     const h = $("hinweis");
     h.hidden = herkunft !== "beispiel";
-    h.textContent = "Du siehst Beispieldaten. Lade über „Tagesplan laden“ deine eigene Datei aus dem Ordner tagesplaene/.";
+    h.textContent = $("gmail").hidden
+      ? "Du siehst Beispieldaten. Lade über „Tagesplan laden“ deine eigene Datei aus dem Ordner tagesplaene/."
+      : "Du siehst Beispieldaten. Tippe auf „Gmail laden“, um deinen echten Posteingang anzuzeigen (nur lesend).";
   }
 
   function fehler(text) {
@@ -140,10 +145,15 @@
     h.textContent = text;
   }
 
-  function ladeBeispiel() {
+  function ladeBeispiel(automatisch) {
     fetch("daten/beispiel.json")
       .then((r) => r.json())
-      .then((p) => zeige(p, "beispiel"))
+      .then((p) => {
+        // Beim Start nicht über bereits geladene echte Daten schreiben.
+        if (automatisch === true && echteDaten) return;
+        echteDaten = false;
+        zeige(p, "beispiel");
+      })
       .catch(() => fehler("Beispiel konnte nicht geladen werden. Starte die App über einen lokalen Server (siehe web/README.md) oder lade eine Datei."));
   }
 
@@ -157,7 +167,119 @@
     };
     leser.readAsText(datei);
   });
-  $("beispiel").addEventListener("click", ladeBeispiel);
+  $("beispiel").addEventListener("click", () => ladeBeispiel(false));
 
-  ladeBeispiel();
+  // ---------------------------------------------------------------------
+  // Gmail live (nur in claude.ai): liest den Posteingang über deine eigene
+  // Gmail-Verbindung. Nur das Such-Werkzeug ist freigegeben – die Seite
+  // kann nichts senden, löschen oder markieren. Mails werden nicht
+  // gespeichert, sondern nur angezeigt.
+  // ---------------------------------------------------------------------
+  const GMAIL = "Gmail";
+  const ABFRAGE = { query: "in:inbox newer_than:1d", pageSize: 50, view: "THREAD_VIEW_SUMMARY" };
+  const WICHTIG_WOERTER = /sicherheit|security|sign-in|anmeldung|passwort|password|dringend|frist|mahnung|überfällig|urgent/i;
+  const MITTEL_WOERTER = /rechnung|zahlung|invoice|buchung|booking|reservierung|reservation|bestätig|confirm|termin|receipt|quittung|rückerstattung|refund/i;
+  const ANTWORT = /^\s*(re|aw|antw|fwd?|wg)\s*:/i;
+
+  function absenderName(m) {
+    const n = (m.addressDisplayNames || []).find((a) => a.emailAddress === m.sender);
+    return (n && n.displayName) || m.sender || "Unbekannt";
+  }
+
+  function bewerte(m) {
+    const l = m.labelIds || [];
+    const text = (m.subject || "") + " " + (m.snippet || "");
+    const werbung = l.includes("CATEGORY_PROMOTIONS") || l.includes("CATEGORY_SOCIAL") || l.includes("CATEGORY_FORUMS");
+    if (WICHTIG_WOERTER.test(text)) return { p: "hoch", grund: "Sicherheit oder Frist – kurz prüfen.", werbung: werbung };
+    if (werbung) return { p: "niedrig", grund: "Werbung, Newsletter oder soziales Netzwerk.", werbung: true };
+    if (l.includes("IMPORTANT") && (ANTWORT.test(m.subject || "") || l.includes("CATEGORY_PERSONAL")))
+      return { p: "hoch", grund: "Persönliche Nachricht, auf die jemand wartet.", werbung: false };
+    if (l.includes("IMPORTANT") || l.includes("STARRED") || MITTEL_WOERTER.test(text))
+      return { p: "mittel", grund: "Wichtig markiert, Rechnung oder Buchung.", werbung: false };
+    return { p: "niedrig", grund: "Kein Handlungsbedarf erkennbar.", werbung: false };
+  }
+
+  function planAusGmail(payload) {
+    const threads = (payload && payload.threads) || [];
+    const reihen = { hoch: 0, mittel: 1, niedrig: 2 };
+    let werbung = 0;
+    const aufgaben = threads.map((t) => {
+      const m = (t.messages || [])[0] || {};
+      const b = bewerte(m);
+      if (b.werbung) werbung++;
+      return {
+        id: "gmail-" + t.id,
+        prioritaet: b.p,
+        titel: m.subject || "(ohne Betreff)",
+        quelle: "E-Mail",
+        von: absenderName(m),
+        grund: b.grund,
+        link: t.viewUrl || m.viewUrl,
+        datum: m.date || "",
+      };
+    }).sort((a, b) => reihen[a.prioritaet] - reihen[b.prioritaet] || (b.datum > a.datum ? 1 : -1));
+
+    const hoch = aufgaben.filter((a) => a.prioritaet === "hoch");
+    const jetzt = new Date();
+    const iso = jetzt.getFullYear() + "-" + String(jetzt.getMonth() + 1).padStart(2, "0") + "-" + String(jetzt.getDate()).padStart(2, "0");
+    return {
+      datum: iso,
+      stand: jetzt.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }),
+      quellen: [
+        { name: "Gmail (live)", status: "ok" },
+        { name: "Microsoft Teams", status: "fehlt", hinweis: "Microsoft 365 auf claude.ai verbinden" },
+        { name: "Kalender", status: "fehlt", hinweis: "Noch kein Kalender verbunden" },
+        { name: "Aufgaben", status: "fehlt", hinweis: "Noch kein Aufgaben-Dienst verbunden" },
+      ],
+      termine: [],
+      aufgaben: aufgaben,
+      statistik: { emails: threads.length, newsletter: werbung, teams: null, aufgaben: null },
+      vorschlag: hoch.length
+        ? hoch.length + " Punkt(e) mit hoher Priorität. Fang an mit: „" + hoch[0].titel + "“. Die Einstufung ist automatisch geschätzt – bitte selbst kurz prüfen."
+        : "Nichts Dringendes im Posteingang der letzten 24 Stunden. Die Einstufung ist automatisch geschätzt.",
+    };
+  }
+
+  function gmailFehler(e) {
+    const code = (e && e.code) || "upstream_error";
+    const texte = {
+      needs_reauth: "Die Gmail-Verbindung ist abgelaufen. Verbinde Gmail neu: claude.ai → Einstellungen → Konnektoren.",
+      server_not_connected: "Gmail ist nicht verbunden. Füge Gmail hinzu: claude.ai → Einstellungen → Konnektoren.",
+      selection_required: "Du hast mehrere Gmail-Verbindungen. Wähle in claude.ai aus, welche diese Seite nutzen soll.",
+      not_in_manifest: "Der Zugriff auf Gmail ist für diese Seite nicht erlaubt. Du kannst ihn im Menü der Seite unter „Berechtigungen“ erlauben.",
+      approval_required: "Der Zugriff auf Gmail braucht deine Zustimmung. Tippe erneut auf „Gmail laden“.",
+      blocked_by_policy: "Gmail ist für dein Konto durch eine Richtlinie gesperrt.",
+      server_unavailable: "Gmail antwortet gerade nicht. Versuch es in einer Minute noch einmal.",
+    };
+    fehler(texte[code] || "Gmail konnte nicht geladen werden (" + code + "). Versuch es gleich noch einmal.");
+  }
+
+  function starteGmail(mcp) {
+    const knopf = $("gmail");
+    knopf.hidden = false;
+
+    function laden() {
+      knopf.disabled = true;
+      knopf.textContent = "Lädt …";
+      // cache:false – Mails werden nirgends zwischengespeichert.
+      mcp.callTool(GMAIL, "search_threads", ABFRAGE, { cache: false })
+        .then((r) => zeige(planAusGmail(r.payload), "gmail"))
+        .catch(gmailFehler)
+        .finally(() => { knopf.disabled = false; knopf.textContent = "Gmail aktualisieren"; });
+    }
+    knopf.addEventListener("click", laden);
+
+    // Wurde Gmail für diese Seite schon erlaubt, direkt laden.
+    const claudeApi = window.claude;
+    claudeApi.use("permissions")
+      .then((perm) => perm ? perm.state("mcp:" + GMAIL) : "unavailable")
+      .catch(() => "unavailable")
+      .then((st) => { if (st === "granted") laden(); });
+  }
+
+  ladeBeispiel(true);
+
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("mcp").then((mcp) => { if (mcp) starteGmail(mcp); }).catch(() => {});
+  }
 })();
