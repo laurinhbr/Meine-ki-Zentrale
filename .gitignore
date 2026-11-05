@@ -1,0 +1,10 @@
+# Persönliche Tagespläne enthalten private Daten – nicht ins Repository!
+tagesplaene/*
+!tagesplaene/.gitkeep
+
+# Lokale Claude-Einstellungen
+.claude/settings.local.json
+
+# Systemdateien
+.DS_Store
+Thumbs.db
