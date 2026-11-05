@@ -1,0 +1,149 @@
+:root {
+  --hg: #f6f5f2;
+  --karte: #ffffff;
+  --text: #1d1d1b;
+  --leise: #6b6a66;
+  --linie: #e4e2dc;
+  --akzent: #2f5d8a;
+  --hoch: #c2410c;
+  --mittel: #b7791f;
+  --niedrig: #3f7d4e;
+  --erledigt: #9a9893;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --hg: #161614;
+    --karte: #20201d;
+    --text: #ecebe7;
+    --leise: #a3a19b;
+    --linie: #34332f;
+    --akzent: #7fa9d4;
+    --hoch: #f08a5d;
+    --mittel: #e0b45a;
+    --niedrig: #7cc08c;
+    --erledigt: #6d6b66;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--hg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.kopf, main, .fuss {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.kopf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-top: 28px;
+  padding-bottom: 20px;
+}
+h1 { margin: 0; font-size: 1.6rem; letter-spacing: -0.01em; }
+.untertitel { margin: 2px 0 0; color: var(--leise); }
+
+.aktionen { display: flex; gap: 8px; }
+.knopf {
+  cursor: pointer;
+  border: 1px solid var(--akzent);
+  background: var(--akzent);
+  color: var(--karte);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 0.95rem;
+}
+.knopf.leise { background: transparent; color: var(--akzent); }
+.knopf:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+
+.hinweis {
+  background: var(--karte);
+  border: 1px dashed var(--linie);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--leise);
+  margin: 0 0 16px;
+}
+
+.raster {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.karte {
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: 12px;
+  padding: 16px 18px;
+  min-width: 0;
+}
+main > .karte { margin-bottom: 16px; }
+.karte h2 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.karte h2 small { color: var(--leise); font-weight: 400; font-size: 0.85rem; }
+
+.punkt { width: 10px; height: 10px; border-radius: 50%; background: var(--leise); flex: none; }
+.prio-hoch .punkt { background: var(--hoch); }
+.prio-mittel .punkt { background: var(--mittel); }
+.prio-niedrig .punkt { background: var(--niedrig); }
+.prio-hoch { border-top: 3px solid var(--hoch); }
+.prio-mittel { border-top: 3px solid var(--mittel); }
+.prio-niedrig { border-top: 3px solid var(--niedrig); }
+
+.liste { list-style: none; margin: 0; padding: 0; }
+.liste li {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--linie);
+}
+.liste li:first-child { border-top: 0; padding-top: 2px; }
+.liste input[type="checkbox"] { margin-top: 4px; accent-color: var(--akzent); flex: none; }
+.liste .titel { font-weight: 600; overflow-wrap: anywhere; }
+.liste .meta { color: var(--leise); font-size: 0.88rem; overflow-wrap: anywhere; }
+.liste .grund { font-size: 0.92rem; }
+.liste li.erledigt .titel,
+.liste li.erledigt .grund { text-decoration: line-through; color: var(--erledigt); }
+.liste .leer { color: var(--leise); font-style: italic; border: 0; }
+.liste a { color: var(--akzent); }
+.zeit { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 4.5em; flex: none; }
+
+.quellen { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.quellen li {
+  border: 1px solid var(--linie);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+}
+.quellen li.ok::before { content: "✓ "; color: var(--niedrig); font-weight: 700; }
+.quellen li.fehlt { color: var(--leise); }
+.quellen li.fehlt::before { content: "! "; color: var(--mittel); font-weight: 700; }
+
+.statistik {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.statistik div { border-left: 3px solid var(--linie); padding-left: 10px; }
+.statistik dt { color: var(--leise); font-size: 0.85rem; }
+.statistik dd { margin: 0; font-size: 1.5rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+
+.fuss { color: var(--leise); font-size: 0.85rem; padding-top: 8px; padding-bottom: 32px; }
